@@ -20,3 +20,6 @@ docker-compose up
 # Add to /etc/host in local laptop
 echo "127.0.0.1 kafka-1 kafka-2 kafka-3" >> /etc/hosts
 ```
+
+## Access Kafka-UI 
+Open http://127.0.0.1:8080
