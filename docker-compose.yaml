@@ -1,0 +1,105 @@
+version: '3'
+
+networks:
+  my_kafka_net:
+    external: true
+
+services:
+  kafka-1:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka-1
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9192,CONTROLLER://:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_BROKER_ID=1
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9192
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_KRAFT_CLUSTER_ID=arthben_kafka_cluster
+    hostname: kafka-1
+    ports:
+      - 9192:9192
+    networks:
+      my_kafka_net:
+        ipv4_address: 192.168.44.11
+    extra_hosts:
+      - "kafka-1:192.168.44.11"
+      - "kafka-2:192.168.44.22"
+      - "kafka-3:192.168.44.33"
+      - "kafka-ui:192.168.44.3"
+
+  kafka-2:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka-2
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9292,CONTROLLER://:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_BROKER_ID=2
+      - KAFKA_CFG_NODE_ID=2
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9292
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_KRAFT_CLUSTER_ID=arthben_kafka_cluster
+    hostname: kafka-2
+    ports:
+      - 9292:9292
+    networks:
+      my_kafka_net:
+        ipv4_address: 192.168.44.22
+    extra_hosts:
+      - "kafka-1:192.168.44.11"
+      - "kafka-2:192.168.44.22"
+      - "kafka-3:192.168.44.33"
+      - "kafka-ui:192.168.44.3"
+      
+  kafka-3:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka-3
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9392,CONTROLLER://:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_BROKER_ID=3
+      - KAFKA_CFG_NODE_ID=3
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9094,2@kafka-2:9094,3@kafka-3:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9392
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_KRAFT_CLUSTER_ID=arthben_kafka_cluster
+    hostname: kafka-3
+    ports:
+      - 9392:9392
+    networks:
+      my_kafka_net:
+        ipv4_address: 192.168.44.33
+    extra_hosts:
+      - "kafka-1:192.168.44.11"
+      - "kafka-2:192.168.44.22"
+      - "kafka-3:192.168.44.33"
+      - "kafka-ui:192.168.44.3"
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: 'provectuslabs/kafka-ui:latest'
+    ports:
+      - "8080:8080"
+    networks:
+      my_kafka_net:
+        ipv4_address: 192.168.44.3
+    extra_hosts:
+      - "kafka-1:192.168.44.11"
+      - "kafka-2:192.168.44.22"
+      - "kafka-3:192.168.44.33"
+      - "kafka-ui:192.168.44.3"
+    environment:
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka-1:9192
+      - KAFKA_CLUSTERS_0_NAME=arthben_kafka_cluster
+
